@@ -1,0 +1,28 @@
+{% extends "master.html" %}
+
+{% block title %}
+預約取餐系統
+{% endblock %}
+
+
+{% block content %}
+<div class="search">
+    <form action="">
+        <label for="search">搜尋:</label>
+        <input type="text" name="search">
+    </form>
+</div>
+<h1>餐廳</h1>
+<div class="restaurant_gallery">
+    {% for x in all_restaurants %}
+    <a href="restaurant/{{ x.id }}">
+        <div class="restaurant_card">
+            <!-- 新增img -->
+            <img src="{{ x.img.url }}" alt="{{ x.name }}">
+            <h3>{{ x.name }}</h3>
+            <p>&starf; {{ x.get_rating|floatformat:1 }}</p>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}

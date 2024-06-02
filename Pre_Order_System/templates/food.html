@@ -1,0 +1,14 @@
+{% extends "master.html" %}
+
+{% block title %}
+{{ food.restaurant.name }} | {{ food.name }}
+{% endblock %}
+
+
+{% block content %}
+<img src="{{ food.img.url }}" alt="{{ food.name }}" style="width: 300px;">
+<h3>{{ food.name }}</h3>
+<p>售價: NT${{ food.price }}</p>
+<p>評分: &starf; {{ food.get_rating|floatformat:1 }}</p>
+<p>已賣出 {{ food.sales }}</p>
+{% endblock %}

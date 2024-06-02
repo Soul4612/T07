@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static '/css/master.css' %}">
+
+</head>
+
+<body>
+    <div class="header">
+        <ul>
+            <li style="float: left;"><a href="/">預約取餐系統</a></li>
+            <li><a href="/user" class="nav">用戶</a></li>
+            <li><a href="/cart" class="nav">購物車</a></li>
+            <li><a href="/order" class="nav">訂單</a></li>
+        </ul>
+    </div>
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <div class="footer">
+        <p>T07隨性的灰林鴞</p>
+    </div>
+</body>
+
+</html>

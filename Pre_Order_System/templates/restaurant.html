@@ -1,0 +1,26 @@
+{% extends "master.html" %}
+
+{% block title %}
+{{ myrestaurant.name }}
+{% endblock %}
+
+
+{% block content %}
+<img src="{{ myrestaurant.img.url }}" alt="{{ myrestaurant.name }}" style="width: 400px;">
+<h3>{{ myrestaurant.name }}</h3>
+<p>評分: &starf; {{ myrestaurant.get_rating|floatformat:1 }}</p>
+<p>{{ myrestaurant.address }}</p>
+<h1>菜單</h1>
+<div class="food_gallery">
+    {% for x in menu %}
+    <a href="{% url 'food' x.id %}">
+        <div class="food_card">
+            <!-- 新增img -->
+            <img src="{{ x.img.url }}" alt="{{ x.name }}">
+            <h3>{{ x.name }}</h3>
+            <p>售價: NT${{ x.price }} | &starf; {{ x.get_rating|floatformat:1 }}</p>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}

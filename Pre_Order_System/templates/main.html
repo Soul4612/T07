@@ -6,12 +6,26 @@
 
 
 {% block content %}
+<style>
+    .log{
+        font-size: 20px;
+    }
+</style>
+
 <div class="search">
     <form action="">
         <label for="search">搜尋:</label>
         <input type="text" name="search">
     </form>
+    <idv class="log">
+        {% if user.is_authenticated %}
+            <a href="{% url 'logout' %}">Logout </a> (Your have login as {{ user }})
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+    </idv>
 </div>
+
 <h1>餐廳</h1>
 <div class="restaurant_gallery">
     {% for x in all_restaurants %}
@@ -25,4 +39,5 @@
     </a>
     {% endfor %}
 </div>
+
 {% endblock %}

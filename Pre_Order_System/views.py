@@ -6,15 +6,39 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import Member, Restaurant, Food, CartItem, OrderItem
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, SearchForm
 
 def main(request):
-    all_restaurants = Restaurant.objects.all()
-    template = loader.get_template('main.html')
+    if request.method == 'GET':
+        all_restaurants = Restaurant.objects.all()
+        Search_Form = SearchForm()
+        context = {
+            'all_restaurants': all_restaurants,
+            'Search_Form': Search_Form,
+        }
+        return render(request, 'main.html', context)
+    
+    Search_Form = SearchForm(request.POST)
+    if not Search_Form.is_valid():
+        context = {
+            'Search_Form': Search_Form,
+            'message': "系統錯誤，請再試一次",
+        }
+        return render(request, 'result.html', context)
+    
+    text = Search_Form.cleaned_data['text']
+    foods = Food.objects.filter(name__icontains=text)
+    restaurants = Restaurant.objects.filter(name__icontains=text)
+    food_set = set()
+    for restaurant in restaurants:
+        food_set.update(restaurant.menu_items.all())
+    foods = sorted(set(foods) | food_set, key=lambda x: x.get_rating(), reverse=True)
     context = {
-        'all_restaurants': all_restaurants,
+        'Search_Form': Search_Form,
+        'message': f"共搜尋到{len(foods)}個結果",
+        'foods': foods,
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, 'result.html', context)
 
 def restaurant(request, id):
     myrestaurant = get_object_or_404(Restaurant, id = id)

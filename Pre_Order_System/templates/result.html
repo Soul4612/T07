@@ -1,9 +1,8 @@
 {% extends "master.html" %}
 
 {% block title %}
-預約取餐系統
+預約取餐系統 | 搜尋結果
 {% endblock %}
-
 
 {% block content %}
 <form action="." method="post">
@@ -13,16 +12,25 @@
     <button type="submit"><i class="fa fa-search"></i></button>
 </form>
 
-<h1>餐廳</h1>
-
+<h3>搜尋結果</h3>
+<p>{{ message }}</p>
+{% if message != "系統錯誤，請再試一次" %}
 <table>
-    {% for x in all_restaurants %}
+    {% for x in foods %}
     <tr>
-        <td><img src="{{ x.img.url }}" alt="{{ x.name }}" style="width: 300px;"></td>
         <td>
-            <a href="restaurant/{{ x.id }}">
+            <img src="{{ x.img.url }}" alt="{{ x.name }}" style="width: 300px;">
+        </td>
+        <td>
+            <a href="{% url 'food' x.id %}">
                 <h3>{{ x.name }}</h3>
             </a>
+        </td>
+        <td>
+            <h3>{{ x.restaurant }}</h3>
+        </td>
+        <td>
+            <p>售價: NT${{ x.price }}</p>
         </td>
         <td>
             <p>&starf; {{ x.get_rating|floatformat:1 }}</p>
@@ -30,5 +38,5 @@
     </tr>
     {% endfor %}
 </table>
-
+{% endif %}
 {% endblock %}

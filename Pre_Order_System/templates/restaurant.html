@@ -11,16 +11,24 @@
 <p>評分: &starf; {{ myrestaurant.get_rating|floatformat:1 }}</p>
 <p>{{ myrestaurant.address }}</p>
 <h1>菜單</h1>
-<div class="food_gallery">
+<table>
     {% for x in menu %}
-    <a href="{% url 'food' x.id %}">
-        <div class="food_card">
-            <!-- 新增img -->
-            <img src="{{ x.img.url }}" alt="{{ x.name }}">
-            <h3>{{ x.name }}</h3>
-            <p>售價: NT${{ x.price }} | &starf; {{ x.get_rating|floatformat:1 }}</p>
-        </div>
-    </a>
+    <tr>
+        <td>
+            <img src="{{ x.img.url }}" alt="{{ x.name }}" style="width: 300px;">
+        </td>
+        <td>
+            <a href="{% url 'food' x.id %}">
+                <h3>{{ x.name }}</h3>
+            </a>
+        </td>
+        <td>
+            <p>售價: NT${{ x.price }}</p>
+        </td>
+        <td>
+            <p>&starf; {{ x.get_rating|floatformat:1 }}</p>
+        </td>
+    </tr>
     {% endfor %}
-</div>
+</table>
 {% endblock %}

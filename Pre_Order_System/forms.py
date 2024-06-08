@@ -10,3 +10,6 @@ class RegisterForm(forms.Form):
     username = forms.CharField(max_length=20)
     password = forms.CharField(max_length=20, widget=forms.PasswordInput)
     password2 = forms.CharField(max_length=20, widget=forms.PasswordInput)
+
+class SearchForm(forms.Form):
+    text = forms.CharField(max_length=20)

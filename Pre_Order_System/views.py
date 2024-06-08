@@ -131,3 +131,21 @@ def register(request):
     new_member = Member(user=user, first_name=first_name, last_name=last_name, username=username, password=password)
     new_member.save()
     return render(request, 'register_successful.html')
+
+@login_required
+def cart(request):
+    member = Member.objects.get(user=request.user)
+    cart = member.cart_items.all()
+    context = {
+        'cart': cart,
+    }
+    return render(request, 'cart.html', context)
+
+@login_required
+def order(request):
+    member = Member.objects.get(user=request.user)
+    order = member.order_items.all()
+    context = {
+        'order': order,
+    }
+    return render(request, 'order.html', context)

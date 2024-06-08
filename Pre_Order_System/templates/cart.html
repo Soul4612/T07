@@ -1,0 +1,36 @@
+{% extends "master.html" %}
+
+{% block title %}
+購物車
+{% endblock %}
+
+
+{% block content %}
+<h2>購物車</h2>
+
+{% if cart %}
+<table>
+    {% for x in cart %}
+    <tr>
+        <td>
+            <img src="{{ x.food.img.url }}" alt="{{ x.food.name }}" style="width: 300px;">
+        </td>
+        <td>
+            <a href="{% url 'food' x.food.id %}">
+                <h3>{{ x.name }}</h3>
+            </a>
+        </td>
+        <td>
+            <p>售價: NT${{ x.food.price }}</p>
+        </td>
+        <td>
+            <p>數量: {{ x.quantity }}</p>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>您的購物車內還沒有餐點</p>
+<p><a href="/">點擊挑選餐點</a></p>
+{% endif %}
+{% endblock %}

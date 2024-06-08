@@ -1,0 +1,36 @@
+{% extends "master.html" %}
+
+{% block title %}
+訂單
+{% endblock %}
+
+
+{% block content %}
+<h2>訂單</h2>
+
+{% if order %}
+<table>
+    {% for x in order %}
+    <tr>
+        <td>
+            <img src="{{ x.food.img.url }}" alt="{{ x.food.name }}" style="width: 300px;">
+        </td>
+        <td>
+            <a href="{% url 'food' x.food.id %}">
+                <h3>{{ x.name }}</h3>
+            </a>
+        </td>
+        <td>
+            <p>售價: NT${{ x.food.price }}</p>
+        </td>
+        <td>
+            <p>數量: {{ x.quantity }}</p>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>您還沒有下訂單</p>
+<p><a href="{% url 'cart' %}">點擊下單</a></p>
+{% endif %}
+{% endblock %}

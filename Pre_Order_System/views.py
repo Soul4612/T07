@@ -1,10 +1,12 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
 from django.template import loader
-from .models import Restaurant, Food
 from django.contrib.auth import authenticate
 from django.contrib import auth
-from .forms import LoginForm
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from .models import Member, Restaurant, Food, CartItem, OrderItem
+from .forms import LoginForm, RegisterForm
 
 def main(request):
     all_restaurants = Restaurant.objects.all()
@@ -32,39 +34,76 @@ def food(request, id):
     }
     return HttpResponse(template.render(context, request))
 
+@login_required
+def member_info(request):
+    member = Member.objects.get(user=request.user)
+    context = {
+        'member': member,
+    }
+    return render(request, 'member_info.html', context)
+
 def login(request):
-    ''' 登入 '''
-    login_page = loader.get_template('login.html')
     if request.method == 'GET':
         login_form = LoginForm()
         context = {
-            'user': request.user,
             'login_form': login_form,
         }
-        return HttpResponse(login_page.render(context, request))
-    elif request.method == "POST":
-        login_form = LoginForm(request.POST)
-        if login_form.is_valid():
-            username = login_form.cleaned_data['username']
-            password = login_form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                auth.login(request, user)
-                main_page = loader.get_template('main.html')
-                context = {'user': request.user,
-                           'message': 'login ok'}
-                return HttpResponse(login_page.render(context, request))
-            else:
-                message = 'Login failed (auth fail)'
-        else:                    
-            print ('Login error (login form is not valid)')
-    else:
-        print ('Error on request (not GET/POST)')
-
+        return render(request, 'login.html', context)
+    
+    login_form = LoginForm(request.POST)
+    if not login_form.is_valid():
+        context = {'message': "系統錯誤"}
+        return render(request, 'login_failed.html', context)
+    
+    username = login_form.cleaned_data['username']
+    password = login_form.cleaned_data['password']
+    if not Member.objects.filter(username=username).exists():
+        context = {'message': "帳號不存在"}
+        return render(request, 'login_failed.html', context)
+    
+    user = authenticate(username=username, password=password)
+    if user is None:
+        context = {'message': "密碼錯誤"}
+        return render(request, 'login_failed.html', context)
+    
+    auth.login(request, user)
+    member = Member.objects.get(user=user)
+    context = {'member': member}
+    return render(request, 'login_successful.html', context)
 
 def logout(request):
-    ''' 登出 '''
     auth.logout(request)
-    main_html = loader.get_template('main.html')
-    context = {'user': request.user}
-    return HttpResponse(main_html.render(context, request))
+    return render(request, 'logout.html')
+
+def register(request):
+    if request.method == 'GET':
+        register_form = RegisterForm()
+        context = {
+            'register_form': register_form,
+        }
+        return render(request, 'register.html', context)
+    
+    register_form = RegisterForm(request.POST)
+    if not register_form.is_valid():
+        context = {'message': "系統錯誤"}
+        return render(request, 'register_failed.html', context)
+
+    first_name = register_form.cleaned_data['first_name']
+    last_name = register_form.cleaned_data['last_name']
+    username = register_form.cleaned_data['username']
+    password = register_form.cleaned_data['password']
+    password2 = register_form.cleaned_data['password2']
+    
+    if Member.objects.filter(username=username).exists():
+        context = {'message': "用戶已存在"}
+        return render(request, 'register_failed.html', context)
+    
+    if password != password2:
+        context = {'message': "確認密碼不相符"}
+        return render(request, 'register_failed.html', context)
+    
+    user = User.objects.create_user(username=username, password=password)
+    user.save()
+    new_member = Member(user=user, first_name=first_name, last_name=last_name, username=username, password=password)
+    new_member.save()
+    return render(request, 'register_successful.html')

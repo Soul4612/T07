@@ -1,0 +1,34 @@
+{% extends "master.html" %}
+
+{% block title %}
+用戶註冊
+{% endblock %}
+
+{% block content %}
+{{ post_form.errors }}
+
+{% if request.user.is_authenticated %}
+<div style="text-align: center;">
+    <h1>您已經登入了!</h1>
+    <p>若是要進行註冊，請先<a href="{% url 'logout' %}">登出</a></p>
+
+</div>
+{% else %}
+<h2>註冊</h2>
+<form action="." method="post">
+    {% csrf_token %}
+    <label for="first_name">姓: </label><br>
+    {{ register_form.first_name }}<br>
+    <label for="last_name">名: </label><br>
+    {{ register_form.last_name }}<br>
+    <label for="username">帳號: </label><br>
+    {{ register_form.username }}<br>
+    <label for="password">密碼: </label><br>
+    {{ register_form.password }}<br>
+    <label for="password2">請再輸入一次密碼: </label><br>
+    {{ register_form.password2 }}<br>
+    <input type="submit" value="註冊">
+</form>
+{% endif %}
+
+{% endblock %}

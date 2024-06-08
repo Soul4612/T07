@@ -1,8 +1,11 @@
 from django.db import models
 from PIL import Image
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Member(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, default= None, blank=True, null=True)
+    
     first_name = models.CharField(max_length=50, verbose_name='名')
     last_name = models.CharField(max_length=50, verbose_name='姓')
     username = models.CharField(max_length=50, unique=True, verbose_name='帳號')

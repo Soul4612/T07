@@ -27,8 +27,7 @@
             <td>
                 <p>
                     數量:
-                    <input type="number" name="quantity" value="{{ x.quantity }}" min="1">
-                    <input type="hidden" name="cartitem_id" value="{{ x.id }}">
+                    <input type="number" name="quantity_{{ x.id }}" value="{{ x.quantity }}" min="1">
                 </p>
             </td>
             <td>

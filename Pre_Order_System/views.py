@@ -180,14 +180,15 @@ def cart(request):
     cart = member.cart_items.all()
     
     if request.method == 'POST':
-        cartitem_id = request.POST.get('cartitem_id')
-        new_quantity = int(request.POST.get('quantity'))
-
-        cartitem = CartItem.objects.get(id=cartitem_id)
         if 'update' in request.POST:
+            cartitem_id = request.POST.get('update')
+            cartitem = CartItem.objects.get(id=cartitem_id)
+            new_quantity = int(request.POST.get(f'quantity_{cartitem_id}'))
             cartitem.quantity = new_quantity
             cartitem.save()
         else:
+            cartitem_id = request.POST.get('delete')
+            cartitem = CartItem.objects.get(id=cartitem_id)
             cartitem.delete()
         return redirect('cart')
     

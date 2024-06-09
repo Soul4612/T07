@@ -43,20 +43,46 @@ def main(request):
 def restaurant(request, id):
     myrestaurant = get_object_or_404(Restaurant, id = id)
     meun = myrestaurant.menu_items.all()
-    template = loader.get_template('restaurant.html')
     context = {
         'myrestaurant': myrestaurant,
         'menu': meun,
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, 'restaurant.html', context)
 
 def food(request, id):
     food = get_object_or_404(Food, id = id)
-    template = loader.get_template('food.html')
+    addfood_success = False
+    quantity = 0
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect('login')
+        addofood_form = AddFoodForm(request.POST)
+        if addofood_form.is_valid():
+            quantity = addofood_form.cleaned_data['quantity']
+            member = Member.objects.get(user=request.user)
+            cartitem, created = CartItem.objects.get_or_create(member=member, food=food, defaults={'quantity': quantity})
+            if not created:
+                cartitem.quantity += quantity
+                cartitem.save()
+            addfood_success = True
+        else:
+            context = {
+                'food': food,
+                'addofood_form': addofood_form,
+                'addfood_success': addfood_success,
+                'message': "系統錯誤！請再試一次",
+            }
+            return render(request, 'food.html', context)
+    else:
+        addofood_form = AddFoodForm()
+    
     context = {
         'food': food,
+        'addofood_form': addofood_form,
+        'addfood_success': addfood_success,
+        'quantity': quantity,
     }
-    return HttpResponse(template.render(context, request))
+    return render(request, 'food.html', context)
 
 @login_required
 def member_info(request):
@@ -100,13 +126,11 @@ def login(request):
         return render(request, 'login.html', context)
     
     auth.login(request, user)
-    member = Member.objects.get(user=user)
-    context = {'member': member}
-    return render(request, 'login_successful.html', context)
+    return redirect('member_info')
 
 def logout(request):
     auth.logout(request)
-    return render(request, 'logout.html')
+    return redirect('main')
 
 def register(request):
     if request.method == 'GET':
@@ -171,43 +195,6 @@ def cart(request):
         'cart': cart,
     }
     return render(request, 'cart.html', context)
-
-@login_required
-def addfood(request, id):
-    food = get_object_or_404(Food, id = id)
-
-    if request.method == 'GET':
-        addofood_form = AddFoodForm()
-        context = {
-            'food': food,
-            'addofood_form': addofood_form,
-        }
-        return render(request, 'addfood.html', context)
-    
-    addofood_form = AddFoodForm(request.POST)
-    if not addofood_form.is_valid():
-        addofood_form = AddFoodForm()
-        context = {
-            'food': food,
-            'addofood_form': addofood_form,
-            'message': "系統錯誤！請再試一次",
-        }
-        return render(request, 'addfood.html', context)
-    
-    quantity = addofood_form.cleaned_data['quantity']
-    member = Member.objects.get(user=request.user)
-    
-    cartitem, created = CartItem.objects.get_or_create(member=member, food=food, defaults={'quantity': quantity})
-    if created:
-        cartitem.quantity = quantity
-    else:
-        cartitem.quantity += quantity
-    cartitem.save()
-    context = {
-        'food': cartitem.food,
-        'quantity': quantity,
-    }
-    return render(request, 'addfood_successful.html', context)
 
 @login_required
 def order(request):

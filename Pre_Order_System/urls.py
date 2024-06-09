@@ -10,6 +10,5 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('register/', views.register, name='register'),
     path('cart/', views.cart, name='cart'),
-    path('addfood/<int:id>', views.addfood, name='addfood'),
     path('order/', views.order, name='order'),
 ]

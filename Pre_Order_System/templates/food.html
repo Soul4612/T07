@@ -10,5 +10,23 @@
 <p>售價: NT${{ food.price }}</p>
 <p>評分: &starf; {{ food.get_rating|floatformat:1 }}</p>
 <p>已賣出 {{ food.sales }}</p>
-<a href="{% url 'addfood' food.id %}">加入購物車</a>
+
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
+
+<form action="" method="post">
+    {% csrf_token %}
+    <label for="quantity">餐點數量: </label><br>
+    {{ addofood_form.quantity }}<br>
+    <input type="submit" value="加入購物車">
+</form>
+
+{% if addfood_success %}
+<script>
+    window.onload = function () {
+        alert("餐點 '{{ food.name }}' ×{{ quantity }} 成功加入購物車!\n");
+    }
+</script>
+{% endif %}
 {% endblock %}

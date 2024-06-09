@@ -217,6 +217,21 @@ def cart(request):
 def order(request):
     member = Member.objects.get(user=request.user)
     order = member.order_items.all()
+    if request.method == 'POST':
+        id = request.POST.get('rating')
+        orderitem = OrderItem.objects.get(id=id)
+        star = int(request.POST.get('star'))
+        food = Food.objects.get(id=orderitem.food.id)
+        food.sales += orderitem.quantity
+        food.stars += star * orderitem.quantity
+        food.save()
+        orderitem.delete()
+        order = member.order_items.all()
+        context = {
+            'order': order,
+            'message': "感謝您的評分!祝您用餐愉快!",
+        }
+        return render(request, 'order.html', context)
     context = {
         'order': order,
     }

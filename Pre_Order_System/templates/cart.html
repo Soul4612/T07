@@ -14,6 +14,9 @@
         {% for x in cart %}
         <tr>
             <td>
+                <input type="checkbox" name="checkbox" value="{{ x.id }}">
+            </td>
+            <td>
                 <img src="{{ x.food.img.url }}" alt="{{ x.food.name }}" style="width: 300px;">
             </td>
             <td>
@@ -37,9 +40,18 @@
         </tr>
         {% endfor %}
     </table>
+    <button type="submit" name="order">確認訂單</button>
 </form>
 {% else %}
 <p>您的購物車內還沒有餐點</p>
 <p><a href="/">點擊挑選餐點</a></p>
+{% endif %}
+
+{% if message %}
+<script>
+    window.onload = function () {
+        alert("{{ message }}");
+    }
+</script>
 {% endif %}
 {% endblock %}

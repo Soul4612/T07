@@ -130,7 +130,7 @@ def login(request):
 
 def logout(request):
     auth.logout(request)
-    return redirect('main')
+    return redirect('login')
 
 def register(request):
     if request.method == 'GET':
@@ -178,7 +178,7 @@ def register(request):
 def cart(request):
     member = Member.objects.get(user=request.user)
     cart = member.cart_items.all()
-    
+    message = ''
     if request.method == 'POST':
         if 'update' in request.POST:
             cartitem_id = request.POST.get('update')
@@ -186,11 +186,27 @@ def cart(request):
             new_quantity = int(request.POST.get(f'quantity_{cartitem_id}'))
             cartitem.quantity = new_quantity
             cartitem.save()
-        else:
+            message = f"餐點數量修改成功!\n餐點 '{cartitem.food.name}' 的數量已修改為 {cartitem.quantity}份"
+        elif 'delete' in request.POST:
             cartitem_id = request.POST.get('delete')
             cartitem = CartItem.objects.get(id=cartitem_id)
+            message = f"餐點 '{cartitem.food.name}' ×{cartitem.quantity} 刪除成功!"
             cartitem.delete()
-        return redirect('cart')
+        else:
+            order_list = request.POST.getlist('checkbox')
+            for i in order_list:
+                cartitem = CartItem.objects.get(id=i)
+                orderitem = OrderItem(member=member, food=cartitem.food, quantity=cartitem.quantity)
+                orderitem.save()
+                cartitem.delete()
+            message = "餐點訂購成功!請至訂單進行取餐及評分!"
+        
+        cart = member.cart_items.all()
+        context = {
+            'cart': cart,
+            'message': message,
+        }
+        return render(request, 'cart.html', context)
     
     context = {
         'cart': cart,

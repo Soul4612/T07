@@ -154,6 +154,19 @@ def register(request):
 def cart(request):
     member = Member.objects.get(user=request.user)
     cart = member.cart_items.all()
+    
+    if request.method == 'POST':
+        cartitem_id = request.POST.get('cartitem_id')
+        new_quantity = int(request.POST.get('quantity'))
+
+        cartitem = CartItem.objects.get(id=cartitem_id)
+        if 'update' in request.POST:
+            cartitem.quantity = new_quantity
+            cartitem.save()
+        else:
+            cartitem.delete()
+        return redirect('cart')
+    
     context = {
         'cart': cart,
     }

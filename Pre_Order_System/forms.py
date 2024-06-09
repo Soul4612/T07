@@ -13,3 +13,6 @@ class RegisterForm(forms.Form):
 
 class SearchForm(forms.Form):
     text = forms.CharField(max_length=20)
+
+class AddFoodForm(forms.Form):
+    quantity = forms.IntegerField(initial=1, min_value=1)

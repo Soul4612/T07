@@ -1,0 +1,16 @@
+{% extends "master.html" %}
+
+{% block title %}
+餐點添加成功
+{% endblock %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h1>餐點添加成功!</h1>
+    <img src="{{ food.img.url }}" alt="{{ food.name }}" style="width: 300px;">
+    <h3>餐點: {{ food.name }} &times;{{ quantity }}</h3>
+    <a href="{% url 'food' food.id %}">返回餐點資訊</a>
+    <a href="{% url 'cart' %}">查看購物車</a>
+    <a href="/">返回首頁</a>
+</div>
+{% endblock %}

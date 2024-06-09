@@ -15,11 +15,16 @@
 </div>
 {% else %}
 <h2>註冊</h2>
+
+{% if message %}
+<p>{{ message }}</p>
+{% endif %}
+
 <form action="." method="post">
     {% csrf_token %}
-    <label for="first_name">姓: </label><br>
+    <label for="first_name">名: </label><br>
     {{ register_form.first_name }}<br>
-    <label for="last_name">名: </label><br>
+    <label for="last_name">姓: </label><br>
     {{ register_form.last_name }}<br>
     <label for="username">帳號: </label><br>
     {{ register_form.username }}<br>

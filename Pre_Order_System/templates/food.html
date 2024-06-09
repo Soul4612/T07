@@ -11,4 +11,5 @@
 <p>售價: NT${{ food.price }}</p>
 <p>評分: &starf; {{ food.get_rating|floatformat:1 }}</p>
 <p>已賣出 {{ food.sales }}</p>
+<a href="{% url 'addfood' food.id %}">加入購物車</a>
 {% endblock %}

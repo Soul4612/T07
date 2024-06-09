@@ -6,7 +6,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .models import Member, Restaurant, Food, CartItem, OrderItem
-from .forms import LoginForm, RegisterForm, SearchForm
+from .forms import LoginForm, RegisterForm, SearchForm, AddFoodForm
 
 def main(request):
     if request.method == 'GET':
@@ -76,19 +76,28 @@ def login(request):
     
     login_form = LoginForm(request.POST)
     if not login_form.is_valid():
-        context = {'message': "系統錯誤"}
-        return render(request, 'login_failed.html', context)
+        context = {
+            'login_form': login_form,
+            'message': "系統錯誤",
+        }
+        return render(request, 'login.html', context)
     
     username = login_form.cleaned_data['username']
     password = login_form.cleaned_data['password']
     if not Member.objects.filter(username=username).exists():
-        context = {'message': "帳號不存在"}
-        return render(request, 'login_failed.html', context)
+        context = {
+            'login_form': login_form,
+            'message': "帳號不存在",
+        }
+        return render(request, 'login.html', context)
     
     user = authenticate(username=username, password=password)
     if user is None:
-        context = {'message': "密碼錯誤"}
-        return render(request, 'login_failed.html', context)
+        context = {
+            'login_form': login_form,
+            'message': "密碼錯誤",
+        }
+        return render(request, 'login.html', context)
     
     auth.login(request, user)
     member = Member.objects.get(user=user)
@@ -109,8 +118,11 @@ def register(request):
     
     register_form = RegisterForm(request.POST)
     if not register_form.is_valid():
-        context = {'message': "系統錯誤"}
-        return render(request, 'register_failed.html', context)
+        context = {
+            'register_form': register_form,
+            'message': "系統錯誤",
+        }
+        return render(request, 'register.html', context)
 
     first_name = register_form.cleaned_data['first_name']
     last_name = register_form.cleaned_data['last_name']
@@ -119,12 +131,18 @@ def register(request):
     password2 = register_form.cleaned_data['password2']
     
     if Member.objects.filter(username=username).exists():
-        context = {'message': "用戶已存在"}
-        return render(request, 'register_failed.html', context)
+        context = {
+            'register_form': register_form,
+            'message': "用戶已存在",
+        }
+        return render(request, 'register.html', context)
     
     if password != password2:
-        context = {'message': "確認密碼不相符"}
-        return render(request, 'register_failed.html', context)
+        context = {
+            'register_form': register_form,
+            'message': "確認密碼不相符",
+        }
+        return render(request, 'register.html', context)
     
     user = User.objects.create_user(username=username, password=password)
     user.save()
@@ -140,6 +158,43 @@ def cart(request):
         'cart': cart,
     }
     return render(request, 'cart.html', context)
+
+@login_required
+def addfood(request, id):
+    food = get_object_or_404(Food, id = id)
+
+    if request.method == 'GET':
+        addofood_form = AddFoodForm()
+        context = {
+            'food': food,
+            'addofood_form': addofood_form,
+        }
+        return render(request, 'addfood.html', context)
+    
+    addofood_form = AddFoodForm(request.POST)
+    if not addofood_form.is_valid():
+        addofood_form = AddFoodForm()
+        context = {
+            'food': food,
+            'addofood_form': addofood_form,
+            'message': "系統錯誤！請再試一次",
+        }
+        return render(request, 'addfood.html', context)
+    
+    quantity = addofood_form.cleaned_data['quantity']
+    member = Member.objects.get(user=request.user)
+    
+    cartitem, created = CartItem.objects.get_or_create(member=member, food=food, defaults={'quantity': quantity})
+    if created:
+        cartitem.quantity = quantity
+    else:
+        cartitem.quantity += quantity
+    cartitem.save()
+    context = {
+        'food': cartitem.food,
+        'quantity': quantity,
+    }
+    return render(request, 'addfood_successful.html', context)
 
 @login_required
 def order(request):

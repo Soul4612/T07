@@ -5,12 +5,14 @@
 {% endblock %}
 
 {% block content %}
-<form action="." method="post">
-    {% csrf_token %}
-    <label for="text">搜尋:</label>
-    {{ Search_Form.text }}
-    <button type="submit"><i class="fa fa-search"></i></button>
-</form>
+<div class="search">
+    <form action="." method="post">
+        {% csrf_token %}
+        <label for="text">搜尋:</label>
+        {{ Search_Form.text }}
+        <button type="submit"><i class="fa fa-search"></i></button>
+    </form>
+</div>
 
 <h3>搜尋結果</h3>
 <p>{{ message }}</p>
